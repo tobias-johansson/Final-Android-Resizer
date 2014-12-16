@@ -22,9 +22,11 @@ I have not tried resizing 9patch images yet.
 
 If you just want to download the executable jar, click <b><a href="https://github.com/asystat/Final-Android-Resizer/blob/master/Executable%20Jar/Final%20Android%20Resizer.jar?raw=true">here</a></b>
 
+Building & Running
+------------------
 
-If you love this tool and want to contribute with the developer, please consider donating!
+1. Install Maven using your package manager or from http://maven.apache.org/download.cgi
+2. `cd /path/to/project`
+3. `mvn package`
+4. `java -jar target/final-android-resizer-1.0-SNAPSHOT.one-jar.jar`
 
-<a href='https://pledgie.com/campaigns/23760'><img alt='Click here to lend your support to: Final Android Resizer and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/23760.png?skin_name=chrome' border='0' ></a>
-
-<a class="coinbase-button" data-code="8660b2e1e3b6bf98beba1c1c1915b805" data-button-style="donation_small" href="https://coinbase.com/checkouts/8660b2e1e3b6bf98beba1c1c1915b805">Donate Bitcoins</a>
