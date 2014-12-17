@@ -1,42 +1,56 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 public class CLI {
 
+    @Option(name = "-in-res", usage = "input resolution", required = true)
+    private String inRes = null;
+
+    @Option(name = "-out-res", usage = "list of output resolutions", required = true, handler = StringArrayOptionHandler.class)
+    private List<String> outRess = null;
+
+    @Option(name = "-out-dir", usage = "output dir", required = true)
+    private File outDir = null;
+
+    @Argument
+    private List<File> files = new ArrayList<File>();
+
     public void run(String[] args) {
+
+        CmdLineParser parser = new CmdLineParser(this);
+
+        try {
+            parser.parseArgument(args);
+            if( files.isEmpty() ) throw new CmdLineException(parser,"No argument is given");
+        } catch( CmdLineException e ) {
+            System.err.println(e.getMessage());
+            parser.printUsage(System.err);
+            return;
+        }
 
         showInfo("Processing..");
 
-        int j = 0;
-
-        File resFile = new File(args[j++]);
-
-        String inputDensity = args[j++];
-
-        Vector<File> fileVector = new Vector<File>();
-        while (j < args.length) {
-            fileVector.add(new File(args[j++]));
-        }
-        File[] files = new File[fileVector.size()];
-        fileVector.toArray(files);
-
-        Vector<String> export = getExportFolders();
-
-        for (int i = 0; i < files.length; i++) {
-            for (String exportString : export) {
+        for (File file : files) {
+            for (String outRes : outRess) {
                 try {
-                    showInfo(files[i].toString());
-                    ImageProcessor.processImage(files[i], resFile, inputDensity, exportString);
+                    String finalPath = ImageProcessor.processImage(file, outDir, inRes, outRes);
+                    showInfo("Wrote " + finalPath);
                 } catch (FileAlreadyExistsException e) {
-                    showWarning("The file " + files[i].getName() + " already exists! This image will not be processed.");
-                    break;
+                    showWarning("Skipping (" + e.getMessage() + ")");
                 } catch (IOException e) {
-                    showError("An IO Error occurred while processing " + files[i].getName());
+                    showError("An IO Error occurred while processing " + file.getName());
                     e.printStackTrace();
                     break;
                 } catch (NullPointerException e) {
-                    showError("The file " + files[i].getName() + " is not an image and will be omitted");
+                    showError("The file " + file.getName() + " is not an image and will be omitted");
                     e.printStackTrace();
                     break;
                 }
@@ -59,8 +73,8 @@ public class CLI {
     }
 
 
-    private Vector<String> getExportFolders() {
-        Vector<String> ret = new Vector<String>();
+    private ArrayList<String> getExportFolders() {
+        ArrayList<String> ret = new ArrayList<String>();
         ret.add("ldpi");
         ret.add("mdpi");
         ret.add("hdpi");
